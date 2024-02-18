@@ -2,6 +2,9 @@
 
 noted is a minimalistic command line note manager written in C.
 
+## Preview
+![](https://r2.e-z.host/3c62bb3a-a8a9-43f6-afd6-553646f51dc4/lzwqimtg.png)
+
 ## Dependencies
 - gcc
 
@@ -10,12 +13,6 @@ noted is a minimalistic command line note manager written in C.
 $ make
 $ sudo make install
 ```
-
-## Usage
-```sh
-$ ./noted
-```
-
 ## Features
 - Uses EDITOR environment variable to open notes
 - Respect XDG variables
@@ -49,3 +46,9 @@ Options:
   -R [filename]	Removes the note specified in the filename.
   -S [filename]	Prints the content of the note specified in the filename.
 ```
+
+# Contributions
+Contributions are welcomed, feel free to open a pull request.
+
+# License
+This project is licensed under the GNU Public License v3.0. See [LICENSE](https://github.com/night0721/noted/blob/master/LICENSE) for more information.
