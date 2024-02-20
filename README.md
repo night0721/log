@@ -13,6 +13,7 @@ noted is a minimalistic command line note manager written in C.
 $ make
 $ sudo make install
 ```
+
 ## Features
 - Uses EDITOR environment variable to open notes
 - Respect XDG variables
