@@ -24,7 +24,7 @@ version:
 
 dist: version noted
 	mkdir -p noted-${VERSION}
-	cp -R LICENSE Makefile README.md noted.1 noted noted-${VERSION}
+	cp -R LICENSE README.md noted.1 noted noted-${VERSION}
 	tar -cf noted-${VERSION}.tar noted-${VERSION}
 	gzip noted-${VERSION}.tar
 	rm -rf noted-${VERSION}
