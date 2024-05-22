@@ -5,7 +5,7 @@ noted is a minimalistic command line note manager written in C.
 ![](https://r2.e-z.host/3c62bb3a-a8a9-43f6-afd6-553646f51dc4/lzwqimtg.png)
 
 # Usage
-```
+```sh
 Usage: ./noted [-l] [-i] [-v] [-h]
        ./noted [-I|-Q|-R|-S] [filename]
 noted is a minimalistic command line note manager written in C.
@@ -20,6 +20,15 @@ Options:
   -S [filename]	Prints the content of the note specified in the filename.
 ```
 
+# Features
+- Uses EDITOR environment variable to open notes
+- Respect XDG variables
+- Search notes by name with interactive prompt
+- Add, remove, and list notes
+- Customizable
+- Supports org, txt, markdown and html format
+- Generate boilerplate for notes for different formats
+
 # Dependencies
 
 None
@@ -30,15 +39,6 @@ You will need to run these with elevated privilages.
 $ make
 # make install
 ```
-
-# Features
-- Uses EDITOR environment variable to open notes
-- Respect XDG variables
-- Search notes by name with interactive prompt
-- Add, remove, and list notes
-- Customizable
-- Supports org, txt, markdown and html format
-- Generate boilerplate for notes for different formats
 
 # Notes
 noted will use the editor defined in the `EDITOR` environment variable to open notes. If `EDITOR` is not defined, you will need to define it in your shell configuration file.
