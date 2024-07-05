@@ -12,31 +12,31 @@
 
 #include "config.h"
 
-char *get_noted_dir() {
+char *get_log_dir() {
     char *xdg_data_home = getenv("XDG_DATA_HOME");
-    char *dirname = "noted";
-    char *noted_dir = NULL;
+    char *dirname = "log";
+    char *log_dir = NULL;
     if (xdg_data_home == NULL) {
         xdg_data_home = getenv("HOME");
         if (xdg_data_home == NULL) {
-            fprintf(stderr, "noted: HOME and XDG_DATA_HOME environment variable not set\n");
+            fprintf(stderr, "log: HOME and XDG_DATA_HOME environment variable not set\n");
             exit(EXIT_FAILURE);
         }
     }
-    noted_dir = malloc(sizeof(char) * (strlen(xdg_data_home) + strlen(dirname) + 2));
-    if (noted_dir == NULL) {
-        fprintf(stderr, "noted: Error allocating memory\n");
+    log_dir = malloc(sizeof(char) * (strlen(xdg_data_home) + strlen(dirname) + 2));
+    if (log_dir == NULL) {
+        fprintf(stderr, "log: Error allocating memory\n");
         exit(EXIT_FAILURE);
     }
-    sprintf(noted_dir, "%s/%s", xdg_data_home, dirname);
+    sprintf(log_dir, "%s/%s", xdg_data_home, dirname);
     struct stat dir_stat;
-    if (!((stat(noted_dir, &dir_stat) == 0) && S_ISDIR(dir_stat.st_mode))) { // check defined path is directory
-        if (mkdir(noted_dir, S_IRWXU)) { // 700
-            fprintf(stderr, "bunker: Cannot create bunker directory\n");
+    if (!((stat(log_dir, &dir_stat) == 0) && S_ISDIR(dir_stat.st_mode))) { // check defined path is directory
+        if (mkdir(log_dir, S_IRWXU)) { // 700
+            fprintf(stderr, "log: Cannot create log directory\n");
             exit(EXIT_FAILURE);
         }
     }
-    return noted_dir;
+    return log_dir;
 }
 
 int compare(const void *a, const void *b) {
@@ -88,12 +88,12 @@ void tree(const char *basepath, int depth) {
 
 int list_dir(const char *dir) {
     if (dir == NULL || *dir == '\0') {
-        fprintf(stderr, "noted: Invalid directory path\n");
+        fprintf(stderr, "log: Invalid directory path\n");
         return 1;
     }
     struct stat dir_stat;
     if (stat(dir, &dir_stat) == -1) {
-        perror("noted");
+        perror("log");
         return errno;
     }
     if (S_ISDIR(dir_stat.st_mode)) {
@@ -101,7 +101,7 @@ int list_dir(const char *dir) {
         return 0;
 
     } else {
-        fprintf(stderr, "noted: %s is not a directory\n", dir);
+        fprintf(stderr, "log: %s is not a directory\n", dir);
         return 1;
     }
 }
@@ -144,22 +144,22 @@ void find_note(const char *basepath, const char *filename, char **filepaths, int
 
 // check if note exists, if yes return the path
 char *check_note_exist(char *filename) {
-    char *noted_dir = get_noted_dir();
+    char *log_dir = get_log_dir();
     char **file_paths = malloc(sizeof(char *) * 128); // max 128 same file names
     int file_count = 0;
-    find_note(noted_dir, (const char *) filename, file_paths, &file_count);
+    find_note(log_dir, (const char *) filename, file_paths, &file_count);
     if (file_count == 0) {
-        free(noted_dir);
+        free(log_dir);
         return NULL;
     } else if (file_count == 1) {
         char *filepath = malloc(sizeof(char) * (strlen(file_paths[0]) + 1));
         if (filepath == NULL) {
-            fprintf(stderr, "noted: Error allocating memory\n");
-            free(noted_dir);
+            fprintf(stderr, "log: Error allocating memory\n");
+            free(log_dir);
             exit(EXIT_FAILURE);
         }
         strcpy(filepath, file_paths[0]);
-        free(noted_dir);
+        free(log_dir);
         return filepath;
     } else {
         printf("Multiple files found with the same name:\n");
@@ -170,18 +170,18 @@ char *check_note_exist(char *filename) {
         int choice;
         scanf("%d", &choice);
         if (choice < 1 || choice > file_count) {
-            fprintf(stderr, "noted: Invalid choice\n");
-            free(noted_dir);
+            fprintf(stderr, "log: Invalid choice\n");
+            free(log_dir);
             return NULL;
         }
         char *filepath = malloc(sizeof(char) * (strlen(file_paths[choice - 1]) + 1));
         if (filepath == NULL) {
-            fprintf(stderr, "noted: Error allocating memory\n");
-            free(noted_dir);
+            fprintf(stderr, "log: Error allocating memory\n");
+            free(log_dir);
             exit(EXIT_FAILURE);
         }
         strcpy(filepath, file_paths[choice - 1]);
-        free(noted_dir);
+        free(log_dir);
         return filepath;
     }
 }
@@ -226,19 +226,19 @@ void add_boiler_plate(FILE *file, const char *filename, const char *ext) {
         fprintf(file, "\t</body>\n");
         fprintf(file, "</html>\n");
     } else {
-        fprintf(stderr, "noted: Unsupported file extension\n");
+        fprintf(stderr, "log: Unsupported file extension\n");
     }
 }
 void print_note(char *filename) {
     if (filename == NULL) {
-        fprintf(stderr, "noted: filename is required\n");
+        fprintf(stderr, "log: filename is required\n");
         return;
     }
     char *filepath = check_note_exist(filename);
     if (filepath != NULL) {
         FILE *file = fopen(filepath, "r");
         if (file == NULL) {
-            perror("noted");
+            perror("log");
             free(filepath);
             return;
         }
@@ -250,7 +250,7 @@ void print_note(char *filename) {
         free(line);
         fclose(file);
     } else {
-        fprintf(stderr, "noted: %s is not in noted\n", filename);
+        fprintf(stderr, "log: %s is not in log\n", filename);
     }
 }
 
@@ -258,14 +258,14 @@ void edit_note(char *filename) {
     char *filepath = check_note_exist(filename);
     char *editor = getenv("EDITOR");
     if (editor == NULL) {
-        fprintf(stderr, "noted: EDITOR environment variable must be set\n");
+        fprintf(stderr, "log: EDITOR environment variable must be set\n");
         free(filepath);
         return;
     }
     if (filepath != NULL) {
         char *cmd = malloc(sizeof(char) * (strlen(editor) + strlen(filepath) + 2));
         if (cmd == NULL) {
-            fprintf(stderr, "noted: Error allocating memory\n");
+            fprintf(stderr, "log: Error allocating memory\n");
             free(filepath);
             return;
         }
@@ -273,17 +273,17 @@ void edit_note(char *filename) {
         system(cmd);
         free(cmd);
     } else {
-        char *noted_dir = get_noted_dir();
-        filepath = malloc(sizeof(char) * (strlen(noted_dir) + strlen(filename) + 2 + strlen(DEFAULT_EXT)));
+        char *log_dir = get_log_dir();
+        filepath = malloc(sizeof(char) * (strlen(log_dir) + strlen(filename) + 2 + strlen(DEFAULT_EXT)));
         if (filepath == NULL) {
-            fprintf(stderr, "noted: Error allocating memory\n");
-            free(noted_dir);
+            fprintf(stderr, "log: Error allocating memory\n");
+            free(log_dir);
             return;
         }
-        sprintf(filepath, "%s/%s%s", noted_dir, filename, DEFAULT_EXT);
+        sprintf(filepath, "%s/%s%s", log_dir, filename, DEFAULT_EXT);
         FILE *file = fopen(filepath, "w");
         if (file == NULL) {
-            perror("noted");
+            perror("log");
             free(filepath);
             return;
         }
@@ -291,7 +291,7 @@ void edit_note(char *filename) {
         fclose(file);
         char *cmd = malloc(sizeof(char) * (strlen(editor) + strlen(filepath) + 2));
         if (cmd == NULL) {
-            fprintf(stderr, "noted: Error allocating memory\n");
+            fprintf(stderr, "log: Error allocating memory\n");
             free(filepath);
             return;
         }
@@ -305,12 +305,12 @@ void remove_note(char *filename) {
     char *filepath = check_note_exist(filename);
     if (filepath != NULL) {
         if (remove(filepath) == -1) {
-            perror("noted");
+            perror("log");
         } else {
-            printf("noted: %s is now removed from noted\n", filename);
+            printf("log: %s is now removed from log\n", filename);
         }
     } else {
-        fprintf(stderr, "noted: %s is not in noted\n", filename);
+        fprintf(stderr, "log: %s is not in log\n", filename);
     }
 }
 
@@ -319,7 +319,7 @@ void search_note(char *filename) {
     if (filepath != NULL) {
         printf("Path of %s: %s\n", filename, filepath);
     } else {
-        fprintf(stderr, "noted: %s is not in noted\n", filename);
+        fprintf(stderr, "log: %s is not in log\n", filename);
     }
 }
 
@@ -330,24 +330,24 @@ void usage(char **argv) {
 
 int main(int argc, char **argv) {
     int res;
-    char *noted_dir = get_noted_dir();
-    if (noted_dir == NULL) {
+    char *log_dir = get_log_dir();
+    if (log_dir == NULL) {
         return 1;
     }
 
     if (argc == 2) {
         if (strcmp(argv[1], "-l") == 0) {
             // read dir and print recursively
-            res = list_dir(noted_dir);
-            free(noted_dir);
+            res = list_dir(log_dir);
+            free(log_dir);
             return res;
         } else if (strcmp(argv[1], "-i") == 0) {
-            printf("noted directory: %s\n", noted_dir);
+            printf("log directory: %s\n", log_dir);
         } else if (strcmp(argv[1], "-v") == 0) {
-            printf("noted: %s\n", VERSION);
+            printf("log: %s\n", VERSION);
         } else if (strcmp(argv[1], "-h") == 0) {
             usage(argv);
-            printf("noted is a minimalistic command line note manager written in C.\n");
+            printf("log is a minimalistic command line note manager written in C.\n");
             printf("Options:\n");
             printf("  -l\t\tLists the notes in the directory in a tree format.\n");
             printf("  -i\t\tPrints the directory where the notes are stored.\n");
@@ -366,7 +366,7 @@ int main(int argc, char **argv) {
             if (argv[2] != NULL && argv[2][0] != '-') {
                 edit_note(argv[2]);
             } else {
-                printf("noted: filename cannot be start with '-'\n");
+                printf("log: filename cannot be start with '-'\n");
                 usage(argv);
             }
         } else if (strcmp(argv[1], "-Q") == 0) {

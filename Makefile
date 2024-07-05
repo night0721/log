@@ -1,45 +1,45 @@
-CC=gcc
+.POSIX:
+.SUFFIXES:
 
+CC = cc
 VERSION = 1.0
-PREFIX = /usr/local
-MANPREFIX = ${PREFIX}/share/man
+TARGET = ccc
+MANPAGE = $(TARGET).1
+CONF = config.h
+PREFIX ?= /usr/local
+BINDIR = $(PREFIX)/bin
+MANDIR = $(PREFIX)/share/man/man1
 
-CFLAGS = -std=gnu11 -O0 -Wall
+# Flags
+CFLAGS = -O3 -march=native -mtune=native -pipe -s -flto -std=c99 -pedantic -Wall -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=600
 
-SRC = noted.c config.h
-OBJ = ${SRC:.c=.o}
+SRC = $(TARGET).c
 
-.c.o:
-	${CC} -c ${CFLAGS} $<
+$(TARGET): $(SRC) $(CONF)
+	$(CC) $(SRC) -o $@ $(CFLAGS)
 
-noted: ${OBJ}
-	${CC} -o $@ ${OBJ}
-	strip noted
+dist: install
+	mkdir -p $(TARGET)-$(VERSION)
+	cp -R README.md $(MANPAGE) $(TARGET) $(TARGET)-$(VERSION)
+	tar -cf $(TARGET)-$(VERSION).tar $(TARGET)-$(VERSION)
+	gzip $(TARGET)-$(VERSION).tar
+	rm -rf $(TARGET)-$(VERSION)
 
-clean:
-	rm -rf noted
-
-version:
-	sed -i 's/#define VERSION "[^"]*"/#define VERSION "${VERSION}"/' config.h
-
-dist: version noted
-	mkdir -p noted-${VERSION}
-	cp -R LICENSE README.md noted.1 noted noted-${VERSION}
-	tar -cf noted-${VERSION}.tar noted-${VERSION}
-	gzip noted-${VERSION}.tar
-	rm -rf noted-${VERSION}
-
-install: all
-	mkdir -p ${DESTDIR}${PREFIX}/bin
-	cp -f noted ${DESTDIR}${PREFIX}/bin
-	chmod 755 ${DESTDIR}${PREFIX}/bin/noted
-	mkdir -p ${DESTDIR}${MANPREFIX}/man1
-	sed "s/VERSION/${VERSION}/g" < noted.1 > ${DESTDIR}${MANPREFIX}/man1/noted.1
-	chmod 644 ${DESTDIR}${MANPREFIX}/man1/noted.1
+install: $(TARGET)
+	mkdir -p $(DESTDIR)$(BINDIR)
+	mkdir -p $(DESTDIR)$(MANDIR)
+	cp -p $(TARGET) $(DESTDIR)$(BINDIR)/$(TARGET)
+	chmod 755 $(DESTDIR)$(BINDIR)/$(TARGET)
+	sed "s/VERSION/${VERSION}/g" < $(MANPAGE) > $(DESTDIR)/$(MANDIR)/$(MANPAGE)
+	chmod 644 $(DESTDIR)$(MANDIR)/$(MANPAGE)
 
 uninstall:
-	rm -f ${DESTDIR}${PREFIX}/bin/noted\
-		${DESTDIR}${MANPREFIX}/man1/noted.1
-all: noted
+	$(RM) $(DESTDIR)$(BINDIR)/$(TARGET)
+	$(RM) $(DESTDIR)$(MANDIR)/$(MANPAGE)
 
-.PHONY: all clean dist install uninstall noted
+clean:
+	$(RM) $(TARGET)
+
+all: $(TARGET)
+
+.PHONY: all dist install uninstall clean
