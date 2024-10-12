@@ -6,8 +6,8 @@ log is a minimalistic command line note manager.
 
 # Usage
 ```sh
-Usage: ./log [-l] [-i] [-v] [-h]
-       ./log [-I|-Q|-R|-S] [filename]
+Usage: log [-l] [-i] [-v] [-h]
+       log [-I|-Q|-R|-S] [filename]
 log is a minimalistic command line note manager written in C.
 Options:
   -l		    Lists the notes in the directory in a tree format.
