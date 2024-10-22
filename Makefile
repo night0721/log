@@ -1,19 +1,16 @@
 .POSIX:
 .SUFFIXES:
 
-CC = cc
 VERSION = 1.0
-TARGET = ccc
+TARGET = log
 MANPAGE = $(TARGET).1
-CONF = config.h
 PREFIX ?= /usr/local
 BINDIR = $(PREFIX)/bin
 MANDIR = $(PREFIX)/share/man/man1
 
-# Flags
-CFLAGS = -O3 -march=native -mtune=native -pipe -s -flto -std=c99 -pedantic -Wall -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=600
+CFLAGS = -O3 -march=native -mtune=native -pipe -s -flto -std=c99 -pedantic -Wall
 
-SRC = $(TARGET).c
+SRC = log.c
 
 $(TARGET): $(SRC) $(CONF)
 	$(CC) $(SRC) -o $@ $(CFLAGS)
@@ -34,11 +31,11 @@ install: $(TARGET)
 	chmod 644 $(DESTDIR)$(MANDIR)/$(MANPAGE)
 
 uninstall:
-	$(RM) $(DESTDIR)$(BINDIR)/$(TARGET)
-	$(RM) $(DESTDIR)$(MANDIR)/$(MANPAGE)
+	rm $(DESTDIR)$(BINDIR)/$(TARGET)
+	rm $(DESTDIR)$(MANDIR)/$(MANPAGE)
 
 clean:
-	$(RM) $(TARGET)
+	rm $(TARGET)
 
 all: $(TARGET)
 

@@ -8,7 +8,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <libgen.h>
-#include <linux/limits.h>
+#include <limits.h>
 
 #include "config.h"
 
