@@ -12,7 +12,7 @@
 
 #include "config.h"
 
-char *get_log_dir() {
+char *get_log_dir(void) {
     char *xdg_data_home = getenv("XDG_DATA_HOME");
     char *dirname = "log";
     char *log_dir = NULL;
