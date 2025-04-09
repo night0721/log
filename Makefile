@@ -1,5 +1,4 @@
 .POSIX:
-.SUFFIXES:
 
 VERSION = 1.0
 TARGET = log
@@ -8,34 +7,34 @@ PREFIX ?= /usr/local
 BINDIR = $(PREFIX)/bin
 MANDIR = $(PREFIX)/share/man/man1
 
-CFLAGS = -Os -march=native -mtune=native -pipe -s -flto -std=c99 -pedantic -Wall -D_DEFAULT_SOURCE
+CFLAGS += -std=c99 -pedantic -Wall -D_DEFAULT_SOURCE
 
-SRC = log.c
+.c.o:
+	$(CC) -o $@ $(CFLAGS) -c $<
 
-$(TARGET): $(SRC) $(CONF)
-	$(CC) $(SRC) -o $@ $(CFLAGS)
+$(TARGET): $(TARGET).o config.h
+	$(CC) -o $@ $(TARGET).o
 
-dist: install
+dist:
 	mkdir -p $(TARGET)-$(VERSION)
 	cp -R README.md $(MANPAGE) $(TARGET) $(TARGET)-$(VERSION)
-	tar -cf $(TARGET)-$(VERSION).tar $(TARGET)-$(VERSION)
-	gzip $(TARGET)-$(VERSION).tar
-	rm -rf $(TARGET)-$(VERSION)
+	tar -czf $(TARGET)-$(VERSION).tar.gz $(TARGET)-$(VERSION)
+	$(RM) -r $(TARGET)-$(VERSION)
 
 install: $(TARGET)
 	mkdir -p $(DESTDIR)$(BINDIR)
 	mkdir -p $(DESTDIR)$(MANDIR)
 	cp -p $(TARGET) $(DESTDIR)$(BINDIR)/$(TARGET)
 	chmod 755 $(DESTDIR)$(BINDIR)/$(TARGET)
-	sed "s/VERSION/${VERSION}/g" < $(MANPAGE) > $(DESTDIR)/$(MANDIR)/$(MANPAGE)
+	sed "s/VERSION/$(VERSION)/g" < $(MANPAGE) > $(DESTDIR)/$(MANDIR)/$(MANPAGE)
 	chmod 644 $(DESTDIR)$(MANDIR)/$(MANPAGE)
 
 uninstall:
-	rm $(DESTDIR)$(BINDIR)/$(TARGET)
-	rm $(DESTDIR)$(MANDIR)/$(MANPAGE)
+	$(RM) $(DESTDIR)$(BINDIR)/$(TARGET)
+	$(RM) $(DESTDIR)$(MANDIR)/$(MANPAGE)
 
 clean:
-	rm $(TARGET)
+	$(RM) $(TARGET) *.o
 
 all: $(TARGET)
 
